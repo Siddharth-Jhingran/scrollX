@@ -244,7 +244,7 @@ function loadReels() {
   var sum = "";
   reelsData.forEach((elem, idx) => {
     sum += `<div class="reel">
-                <video autoplay muted loop
+                <video autoplay ${ismuted} playsinline loop
                     src="${elem.video}"></video>
 
 
@@ -292,14 +292,110 @@ allReels.addEventListener('click', function (elem) {
     reelsData[elem.target.id].liked = true;
     reelsData[elem.target.id].likes++;
   }
-  // console.log(reelsData)
   loadReels();
+  sectionVideo();
 })
+var ismuted = "muted"
+allReels.addEventListener('click', function () {
+  if (ismuted === "") {
+    ismuted = "muted"
+  }
+  else {
+    ismuted = ""
+  }
+  console.log("lksjhfg")
+  sectionVideo();
+  loadReels();
+  sectionVideo();
 
-
+})
 var reelvid = document.querySelectorAll(".reel video")
 reelvid.forEach((video) => {
   video.addEventListener("click", function () {
     video.muted = !video.muted;
   });
 });
+
+
+// const videos = document.querySelectorAll("video");
+
+// const observer = new IntersectionObserver(
+//   (entries) => {
+//     entries.forEach(entry => {
+//       const video = entry.target;
+
+//       if (entry.isIntersecting) {
+//         video.play();
+//       } else {
+//         video.pause();
+//         video.currentTime = 0; // optional: reset
+//       }
+//     });
+//   },
+//   {
+//     threshold: 0.6 // 60% visible = active reel
+//   }
+// );
+
+// videos.forEach(video => observer.observe(video));
+
+
+
+let sectionVideo = function(){
+
+
+
+
+// 1. Select all video elements on the page
+const videos = document.querySelectorAll('video');
+
+// 2. Define the Intersection Observer options
+const observerOptions = {
+    root: null, // observes relative to the viewport
+    rootMargin: '0px',
+    threshold: 0.8 // trigger when at least 80% of the video is visible
+};
+
+// 3. Define the function that runs when visibility changes
+function handleIntersection(entries, observer) {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            // If the current entry is visible, play it
+            playVideo(entry.target);
+        } else {
+            // If it's not visible, pause it
+            pauseVideo(entry.target);
+        }
+    });
+}
+
+// 4. Helper function to play the video and pause all others
+function playVideo(videoElement) {
+    // First, pause every single video on the page
+    videos.forEach(vid => {
+        if (vid !== videoElement) {
+            vid.pause();
+        }
+    });
+    
+    // Then, play the target video
+    // Use .play() with a catch to prevent common "DOMException: Play() failed" errors
+    videoElement.play().catch(error => {
+        console.error("Video play failed:", error);
+    });
+}
+
+// 5. Helper function to pause a specific video
+function pauseVideo(videoElement) {
+    videoElement.pause();
+}
+
+// 6. Create and start the observer
+const observer = new IntersectionObserver(handleIntersection, observerOptions);
+
+// 7. Tell the observer to watch every video element
+videos.forEach(video => {
+    observer.observe(video);
+});
+}
+sectionVideo();
